@@ -1,7 +1,7 @@
 import StickerCard from './StickerCard'
 import { getTeamStickers } from '../../data/albumData'
 
-export default function TeamSection({ team, collection, onToggle }) {
+export default function TeamSection({ team, collection, onIncrement, onDecrement }) {
   const stickers = getTeamStickers(team.code)
   const owned = stickers.filter((s) => (collection[s.id] ?? 0) >= 1).length
   const total = stickers.length
@@ -13,18 +13,16 @@ export default function TeamSection({ team, collection, onToggle }) {
           <span className="text-2xl">{team.flag}</span>
           <span className="font-semibold text-sm text-white">{team.name}</span>
         </div>
-        <span className="text-xs text-gray-400">
-          {owned}/{total}
-        </span>
+        <span className="text-xs text-gray-400">{owned}/{total}</span>
       </div>
-      <div className="grid grid-cols-5 gap-1">
+      <div className="grid grid-cols-5 gap-2">
         {stickers.map((s) => (
           <StickerCard
             key={s.id}
-            stickerId={s.id}
             label={s.label}
             count={collection[s.id] ?? 0}
-            onToggle={() => onToggle(s.id)}
+            onIncrement={() => onIncrement(s.id)}
+            onDecrement={() => onDecrement(s.id)}
           />
         ))}
       </div>

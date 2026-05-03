@@ -2,29 +2,30 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function Navbar() {
-  const { user, signOut } = useAuth()
+  const { user, isAdmin, signOut } = useAuth()
   const { pathname } = useLocation()
 
   const links = [
     { to: '/album', label: 'Álbum' },
     { to: '/mi-qr', label: 'Mi QR' },
     { to: '/escanear', label: 'Escanear' },
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
   ]
 
   return (
     <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <Link to="/" className="font-bold text-lg text-yellow-400 tracking-tight">
+        <Link to="/" className="font-bold text-lg text-yellow-400 tracking-tight shrink-0">
           ⚽ Figuritas 2026
         </Link>
 
         {user && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 overflow-x-auto">
             {links.map(({ to, label }) => (
               <Link
                 key={to}
                 to={to}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   pathname === to
                     ? 'bg-yellow-400 text-gray-900'
                     : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -35,7 +36,7 @@ export default function Navbar() {
             ))}
             <button
               onClick={signOut}
-              className="ml-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+              className="ml-2 px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors whitespace-nowrap"
             >
               Salir
             </button>

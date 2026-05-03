@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 export function useCollection() {
   const { user } = useAuth()
-  const [collection, setCollection] = useState({}) // { stickerId: count }
+  const [collection, setCollection] = useState({})
   const [loading, setLoading] = useState(true)
 
   const fetchCollection = useCallback(async () => {
@@ -26,9 +26,7 @@ export function useCollection() {
 
   const setCount = async (stickerId, count) => {
     if (!user) return
-    const newCollection = { ...collection, [stickerId]: count }
-    setCollection(newCollection)
-
+    setCollection((prev) => ({ ...prev, [stickerId]: count }))
     if (count === 0) {
       await supabase
         .from('user_stickers')
@@ -42,16 +40,18 @@ export function useCollection() {
     }
   }
 
-  const toggle = (stickerId) => {
+  const increment = (stickerId) => {
     const current = collection[stickerId] ?? 0
-    if (current === 0) setCount(stickerId, 1)
-    else if (current === 1) setCount(stickerId, 2)
-    else setCount(stickerId, 0)
+    setCount(stickerId, current + 1)
+  }
+
+  const decrement = (stickerId) => {
+    const current = collection[stickerId] ?? 0
+    if (current > 0) setCount(stickerId, current - 1)
   }
 
   const owned = Object.keys(collection).filter((id) => (collection[id] ?? 0) >= 1)
   const duplicates = Object.keys(collection).filter((id) => (collection[id] ?? 0) >= 2)
-  const missing = []
 
-  return { collection, loading, setCount, toggle, owned, duplicates, refetch: fetchCollection }
+  return { collection, loading, setCount, increment, decrement, owned, duplicates, refetch: fetchCollection }
 }

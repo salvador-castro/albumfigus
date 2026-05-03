@@ -54,3 +54,7 @@ ehthumbs.db
 
 # Local config
 *.local
+
+# Supabase - archivos con datos sensibles (emails, roles admin, etc.)
+supabase_admin_setup.sql
+supabase_admin*.sql

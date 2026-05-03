@@ -6,6 +6,7 @@ import Album from './pages/Album'
 import MyQR from './pages/MyQR'
 import Scanner from './pages/Scanner'
 import Match from './pages/Match'
+import Admin from './pages/Admin'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -29,6 +30,7 @@ function AppRoutes() {
         <Route path="/mi-qr" element={<ProtectedRoute><MyQR /></ProtectedRoute>} />
         <Route path="/escanear" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
         <Route path="/match/:userId" element={<ProtectedRoute><Match /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
       </Routes>
     </div>
   )
