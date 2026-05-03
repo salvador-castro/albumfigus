@@ -17,7 +17,11 @@ export default function Navbar() {
   const close = () => setOpen(false)
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+    <nav className="bg-gray-900 sticky top-0 z-50">
+      <div
+        className="h-1 w-full"
+        style={{ background: 'linear-gradient(90deg,#003DA5,#0052FF,#22C55E,#FFD100,#FF6B00,#EF4444,#8B5CF6,#06B6D4,#003DA5)' }}
+      />
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
         <Link to="/" className="flex items-center gap-2 shrink-0" onClick={close}>
           <img src="/logoMundial2026.jpg" alt="Mundial 2026" className="w-8 h-8 object-contain" />
