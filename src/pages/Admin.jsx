@@ -3,6 +3,68 @@ import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
+function EditModal({ editingUser, editForm, setEditForm, onSave, onClose, saving }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md p-6">
+        <h2 className="text-lg font-bold text-white mb-1">Editar usuario</h2>
+        <p className="text-gray-500 text-xs mb-4 break-all">{editingUser.id}</p>
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Nombre completo</label>
+            <input
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-400"
+              value={editForm.full_name}
+              onChange={(e) => setEditForm((f) => ({ ...f, full_name: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Nombre de usuario</label>
+            <input
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-400"
+              value={editForm.username}
+              onChange={(e) => setEditForm((f) => ({ ...f, username: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Email</label>
+            <input
+              type="email"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-400"
+              value={editForm.email}
+              onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Avatar URL</label>
+            <input
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-yellow-400"
+              value={editForm.avatar_url}
+              onChange={(e) => setEditForm((f) => ({ ...f, avatar_url: e.target.value }))}
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+        <div className="flex gap-2 mt-5 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 text-sm transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 text-sm transition-colors disabled:opacity-50"
+          >
+            {saving ? 'Guardando...' : 'Guardar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth()
   const [users, setUsers] = useState([])
@@ -10,6 +72,9 @@ export default function Admin() {
   const [error, setError] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [togglingId, setTogglingId] = useState(null)
+  const [editingUser, setEditingUser] = useState(null)
+  const [editForm, setEditForm] = useState({ full_name: '', username: '', email: '', avatar_url: '' })
+  const [savingEdit, setSavingEdit] = useState(false)
 
   if (!loading && (!user || !isAdmin)) return <Navigate to="/album" replace />
 
@@ -47,12 +112,57 @@ export default function Admin() {
     setTogglingId(null)
   }
 
+  const openEdit = (u) => {
+    setEditingUser(u)
+    setEditForm({
+      full_name: u.full_name ?? '',
+      username: u.username ?? '',
+      email: u.email ?? '',
+      avatar_url: u.avatar_url ?? '',
+    })
+  }
+
+  const handleSaveEdit = async () => {
+    setSavingEdit(true)
+    const { error } = await supabase.rpc('admin_update_user', {
+      target_user_id: editingUser.id,
+      new_full_name: editForm.full_name,
+      new_username: editForm.username,
+      new_email: editForm.email,
+      new_avatar_url: editForm.avatar_url,
+    })
+    if (error) {
+      alert('Error: ' + error.message)
+    } else {
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === editingUser.id
+            ? { ...u, full_name: editForm.full_name, username: editForm.username, email: editForm.email, avatar_url: editForm.avatar_url }
+            : u
+        )
+      )
+      setEditingUser(null)
+    }
+    setSavingEdit(false)
+  }
+
   if (loading || loadingUsers) {
     return <div className="flex items-center justify-center h-64 text-gray-400">Cargando usuarios...</div>
   }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
+      {editingUser && (
+        <EditModal
+          editingUser={editingUser}
+          editForm={editForm}
+          setEditForm={setEditForm}
+          onSave={handleSaveEdit}
+          onClose={() => setEditingUser(null)}
+          saving={savingEdit}
+        />
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Panel de Admin</h1>
@@ -111,15 +221,23 @@ export default function Admin() {
                   </button>
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {u.id !== user.id && (
+                  <div className="flex items-center justify-center gap-2">
                     <button
-                      onClick={() => handleDelete(u.id, u.email)}
-                      disabled={deletingId === u.id}
-                      className="px-3 py-1 bg-red-950 text-red-400 hover:bg-red-900 rounded-lg text-xs transition-colors disabled:opacity-50"
+                      onClick={() => openEdit(u)}
+                      className="px-3 py-1 bg-blue-950 text-blue-400 hover:bg-blue-900 rounded-lg text-xs transition-colors"
                     >
-                      {deletingId === u.id ? '...' : 'Eliminar'}
+                      Editar
                     </button>
-                  )}
+                    {u.id !== user.id && (
+                      <button
+                        onClick={() => handleDelete(u.id, u.email)}
+                        disabled={deletingId === u.id}
+                        className="px-3 py-1 bg-red-950 text-red-400 hover:bg-red-900 rounded-lg text-xs transition-colors disabled:opacity-50"
+                      >
+                        {deletingId === u.id ? '...' : 'Eliminar'}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
