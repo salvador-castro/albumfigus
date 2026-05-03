@@ -38,7 +38,11 @@ export default function Login() {
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="text-5xl mb-2">⚽</div>
+          <img
+            src="/logoMundial2026.jpg"
+            alt="FIFA World Cup 2026"
+            className="w-24 h-24 mx-auto mb-3 object-contain"
+          />
           <h1 className="text-2xl font-bold text-white">Figuritas 2026</h1>
           <p className="text-gray-400 text-sm mt-1">Mundial USA · Canadá · México</p>
         </div>
@@ -80,12 +84,8 @@ export default function Login() {
             className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400 transition-colors"
           />
 
-          {error && (
-            <p className="text-red-400 text-sm">{error}</p>
-          )}
-          {message && (
-            <p className="text-green-400 text-sm">{message}</p>
-          )}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {message && <p className="text-green-400 text-sm">{message}</p>}
 
           <button
             type="submit"

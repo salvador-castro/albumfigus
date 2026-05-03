@@ -1,16 +1,19 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import Navbar from './components/layout/Navbar'
 import Login from './pages/Login'
 import Album from './pages/Album'
 import MyQR from './pages/MyQR'
-import Scanner from './pages/Scanner'
 import Match from './pages/Match'
 import Admin from './pages/Admin'
 
+const Scanner = lazy(() => import('./pages/Scanner'))
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">Cargando...</div>
+  if (loading) return <div className="flex items-center justify-center h-screen bg-gray-950 text-gray-400">Cargando...</div>
   if (!user) return <Navigate to="/login" replace />
   return children
 }
@@ -18,7 +21,7 @@ function ProtectedRoute({ children }) {
 function AppRoutes() {
   const { user, loading } = useAuth()
 
-  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">Cargando...</div>
+  if (loading) return <div className="flex items-center justify-center h-screen bg-gray-950 text-gray-400">Cargando...</div>
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -28,7 +31,16 @@ function AppRoutes() {
         <Route path="/" element={<Navigate to={user ? '/album' : '/login'} replace />} />
         <Route path="/album" element={<ProtectedRoute><Album /></ProtectedRoute>} />
         <Route path="/mi-qr" element={<ProtectedRoute><MyQR /></ProtectedRoute>} />
-        <Route path="/escanear" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
+        <Route
+          path="/escanear"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex items-center justify-center h-64 text-gray-400">Cargando escáner...</div>}>
+                <Scanner />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
         <Route path="/match/:userId" element={<ProtectedRoute><Match /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
       </Routes>
@@ -40,7 +52,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   )

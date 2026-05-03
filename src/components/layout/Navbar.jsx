@@ -15,8 +15,13 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <Link to="/" className="font-bold text-lg text-yellow-400 tracking-tight shrink-0">
-          ⚽ Figuritas 2026
+        <Link to="/" className="flex items-center gap-2 shrink-0">
+          <img
+            src="/logoMundial2026.jpg"
+            alt="Mundial 2026"
+            className="w-8 h-8 object-contain"
+          />
+          <span className="font-bold text-lg text-yellow-400 tracking-tight">Figuritas 2026</span>
         </Link>
 
         {user && (
