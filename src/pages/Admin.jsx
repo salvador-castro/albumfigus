@@ -75,6 +75,8 @@ export default function Admin() {
   const [editingUser, setEditingUser] = useState(null)
   const [editForm, setEditForm] = useState({ full_name: '', username: '', email: '', avatar_url: '' })
   const [savingEdit, setSavingEdit] = useState(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 10
 
   if (!loading && (!user || !isAdmin)) return <Navigate to="/album" replace />
 
@@ -194,7 +196,7 @@ export default function Admin() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((u) => (
               <tr key={u.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
                 <td className="px-4 py-3">
                   <div className="font-medium text-white">{u.full_name || u.username || '—'}</div>
@@ -244,6 +246,30 @@ export default function Admin() {
           </tbody>
         </table>
       </div>
+
+      {users.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-gray-500 text-xs">
+            Página {page} de {Math.ceil(users.length / PAGE_SIZE)}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page === 1}
+              className="px-3 py-1.5 bg-gray-800 text-gray-300 rounded-lg text-sm hover:bg-gray-700 disabled:opacity-40 transition-colors"
+            >
+              ← Anterior
+            </button>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= Math.ceil(users.length / PAGE_SIZE)}
+              className="px-3 py-1.5 bg-gray-800 text-gray-300 rounded-lg text-sm hover:bg-gray-700 disabled:opacity-40 transition-colors"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
