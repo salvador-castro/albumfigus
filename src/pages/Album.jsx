@@ -235,27 +235,42 @@ export default function Album() {
           </div>
         )}
 
-        {GROUPS.map((group) => {
-          const visibleTeams = group.teams.filter(teamVisible)
-          if (visibleTeams.length === 0) return null
-          return (
-            <div key={group.name}>
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{group.name}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {visibleTeams.map((team) => (
-                  <TeamSection
-                    key={team.code}
-                    team={team}
-                    collection={collection}
-                    onIncrement={increment}
-                    onDecrement={decrement}
-                    filterStickers={filterCollection}
-                  />
-                ))}
+        {filter !== 'Todas' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {GROUPS.flatMap((g) => g.teams).filter(teamVisible).map((team) => (
+              <TeamSection
+                key={team.code}
+                team={team}
+                collection={collection}
+                onIncrement={increment}
+                onDecrement={decrement}
+                filterStickers={filterCollection}
+              />
+            ))}
+          </div>
+        ) : (
+          GROUPS.map((group) => {
+            const visibleTeams = group.teams.filter(teamVisible)
+            if (visibleTeams.length === 0) return null
+            return (
+              <div key={group.name}>
+                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">{group.name}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {visibleTeams.map((team) => (
+                    <TeamSection
+                      key={team.code}
+                      team={team}
+                      collection={collection}
+                      onIncrement={increment}
+                      onDecrement={decrement}
+                      filterStickers={filterCollection}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })
+        )}
       </div>
 
       <p className="text-center text-gray-600 text-xs mt-8">
