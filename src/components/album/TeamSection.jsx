@@ -2,11 +2,14 @@ import { useState } from 'react'
 import StickerCard from './StickerCard'
 import { getTeamStickers } from '../../data/albumData'
 
-export default function TeamSection({ team, collection, onIncrement, onDecrement }) {
-  const stickers = getTeamStickers(team.code)
-  const owned = stickers.filter((s) => (collection[s.id] ?? 0) >= 1).length
-  const total = stickers.length
+export default function TeamSection({ team, collection, onIncrement, onDecrement, filterStickers }) {
+  const allStickers = getTeamStickers(team.code)
+  const stickers = filterStickers ? filterStickers(allStickers) : allStickers
+  const owned = allStickers.filter((s) => (collection[s.id] ?? 0) >= 1).length
+  const total = allStickers.length
   const [imgError, setImgError] = useState(false)
+
+  if (stickers.length === 0) return null
 
   return (
     <div className="bg-gray-900 rounded-xl p-3 border border-gray-800">

@@ -247,6 +247,7 @@ export default function Album() {
                     collection={collection}
                     onIncrement={increment}
                     onDecrement={decrement}
+                    filterStickers={filterCollection}
                   />
                 ))}
               </div>
