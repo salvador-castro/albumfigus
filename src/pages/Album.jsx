@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCollection } from '../hooks/useCollection'
 import { GROUPS, SPECIAL_STICKERS, COCA_COLA_STICKERS, getAllStickerIds, getTeamStickers } from '../data/albumData'
 import TeamSection from '../components/album/TeamSection'
@@ -40,6 +40,8 @@ export default function Album() {
   const [search, setSearch] = useState('')
   const [showExport, setShowExport] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [filter])
 
   const totalStickers = getAllStickerIds().length
   const totalOwned = Object.keys(collection).filter((id) => (collection[id] ?? 0) >= 1).length
