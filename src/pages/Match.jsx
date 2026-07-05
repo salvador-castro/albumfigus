@@ -7,7 +7,7 @@ import clsx from 'clsx'
 
 export default function Match() {
   const { userId } = useParams()
-  const { collection: myCollection } = useCollection()
+  const { collection: myCollection, loading: myLoading } = useCollection()
   const [theirCollection, setTheirCollection] = useState({})
   const [theirProfile, setTheirProfile] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -37,7 +37,7 @@ export default function Match() {
     load()
   }, [userId])
 
-  if (loading) {
+  if (loading || myLoading) {
     return <div className="flex items-center justify-center h-64 text-gray-400">Calculando intercambio...</div>
   }
 

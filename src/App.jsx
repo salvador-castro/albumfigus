@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import Navbar from './components/layout/Navbar'
@@ -13,8 +13,12 @@ const Scanner = lazy(() => import('./pages/Scanner'))
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
+  const location = useLocation()
   if (loading) return <div className="flex items-center justify-center h-screen bg-gray-950 text-gray-400">Cargando...</div>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) {
+    sessionStorage.setItem('redirectAfterLogin', location.pathname + location.search)
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
   return children
 }
 

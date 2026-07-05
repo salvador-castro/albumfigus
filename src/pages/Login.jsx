@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 function ConfirmEmailModal({ email, onClose }) {
@@ -42,7 +42,13 @@ export default function Login() {
   const [registeredEmail, setRegisteredEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (user) return <Navigate to="/album" replace />
+  const location = useLocation()
+  const redirectTo = location.state?.from?.pathname || sessionStorage.getItem('redirectAfterLogin') || '/album'
+
+  if (user) {
+    sessionStorage.removeItem('redirectAfterLogin')
+    return <Navigate to={redirectTo} replace />
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
